@@ -5,20 +5,17 @@ from utils import create_words_file
 app = Flask(__name__)
 
 
-@app.route('/')
+@app.route('/', methods=['GET', 'POST'])
 def index_page():
-    return render_template('index.html', title='СЭБ ОК РКЗ "Ресурс"')
-
-
-@app.route('/duty_schedule', methods=['GET', 'POST'])
-def duty_table_for_3():
     if request.method == 'POST':
         fio_1 = request.form.get('fio_1')
         fio_2 = request.form.get('fio_2')
         fio_3 = request.form.get('fio_3')
         name_word_file = request.form.get('name_file')
         create_words_file([fio_1, fio_2, fio_3], f'{name_word_file}')
-    return render_template('duty_table_3.html', tittle='Ответ сервера')
+        return render_template('duty_table_3.html', tittle='Ответ сервера')
+    else:
+        return render_template('index.html', title='СЭБ ОК РКЗ "Ресурс"')
 
 
 @app.route('/login')
