@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>СЭБ ОК РКЗ "Ресурс"</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='CSS/style.css') }}">
+</head>
+<body>
+<h1>Добрый день, Вас приветствует пилотная версия WSGI-приложения,<br>которое поможет Вам в создании графиков
+    дежурств!</h1>
+<div class="container">
+    <p>Заполните все необходимые поля</p>
+    <p>Если количество постов равно 6 укажите ФИО через <strong>"/"</strong></p>
+    <form action="{{ url_for('duty_table_for_3') }}" method="post">
+        <div class="fio">
+            <lable>1 смена:</lable>
+            <input type="text" name="fio_1" required></div>
+        <div class="fio">
+            <lable>2 смена:</lable>
+            <input type="text" name="fio_2" required></div>
+        <div class="fio">
+            <lable>3 смена:</lable>
+            <input type="text" name="fio_3" required></div>
+        <div class="fio"><input type="submit" value="Отправить"></div>
+    </form>
+</div>
+</body>
+</html>
