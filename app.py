@@ -7,7 +7,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def index_page():
-    return render_template('index.html')
+    return render_template('index.html', title='СЭБ ОК РКЗ "Ресурс"')
 
 
 @app.route('/duty_schedule', methods=['GET', 'POST'])
@@ -16,8 +16,19 @@ def duty_table_for_3():
         fio_1 = request.form.get('fio_1')
         fio_2 = request.form.get('fio_2')
         fio_3 = request.form.get('fio_3')
-        create_words_file([fio_1, fio_2, fio_3], 'post_1')
-    return render_template('duty_table_3.html')
+        name_word_file = request.form.get('name_file')
+        create_words_file([fio_1, fio_2, fio_3], f'{name_word_file}')
+    return render_template('duty_table_3.html', tittle='Ответ сервера')
+
+
+@app.route('/login')
+def login_page():
+    return render_template('login.html', title='Войти в систему')
+
+
+@app.route('/registration')
+def reg_page():
+    return render_template('registration.html', title='Регистрация')
 
 
 if __name__ == '__main__':
