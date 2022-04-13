@@ -1,7 +1,6 @@
 import calendar
 import datetime
 
-import openpyxl
 from docx import Document
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
 
@@ -22,19 +21,6 @@ def show_duty_days(fio: list):
         days_list_temp = []
 
     return duty_table
-
-
-def create_excel_file(lst, name_file):
-    book = openpyxl.Workbook()
-    book.remove(book.active)
-    sheet_1 = book.create_sheet(f'{name_file}')
-    # sheet_1.insert_rows(0)
-    # sheet_1["A1"].value = "ФИО"
-    # sheet_1["B1"].value = "Дни дежурств"
-    for sheet in book.worksheets:
-        for row in show_duty_days(lst).values():
-            sheet.append(row)
-    book.save(f'static/excel_files/{name_file}.xlsx')
 
 
 def create_words_file(lst, name_file):
