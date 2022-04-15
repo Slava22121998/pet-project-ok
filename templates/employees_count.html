@@ -2,9 +2,9 @@
 {% block title %}{{ title }}{% endblock %}
 {% block body %}
     <p class="lead" style="text-align: center">
-        Укажите количество контролёров на данном объекте:
+        Укажите количество контролёров на охраняемом объекте и нажмите "Enter":
     </p>
-    <form action="{{ url_for('irr_graph') }}" method="post">
+    <form action="{{ url_for('irr_graph') }}" method="post" class="form-basic">
         <div class="input-group">
             <input type="text" name="input_count" requiredaria-label="First name" class="form-control">
         </div>

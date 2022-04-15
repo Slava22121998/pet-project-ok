@@ -32,7 +32,7 @@ def irr_graph():
         input_count = int(request.form.get('input_count'))
         return redirect(url_for('irr_graph_for_count_employees', count=input_count))
     else:
-        return render_template('employees_count.html', title='СЭБ ОК РКЗ "Ресурс"')
+        return render_template('employees_count.html', title='Количество сотрудников')
 
 
 @app.route('/irregular_graph/employees/<int:count>/', methods=['GET', 'POST'])

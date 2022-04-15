@@ -8,30 +8,30 @@
           integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 </head>
 <body>
-{% block body %}
-    <div class="container">
-        <ul class="nav nav-pills">
-            <li class="nav-item">
-                <a class="nav-link active" aria-current="page" href="#">Главная</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#">О нас</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#">Контакты</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#">Политика безопасности</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('reg_page') }}">Регистрация</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="{{ url_for('login_page') }}">Авторизация</a>
-            </li>
-        </ul>
+<div class="container">
+    <ul class="nav nav-pills">
+        <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="{{ url_for('index_page') }}">Главная</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">О нас</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">Контакты</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="#">Политика безопасности</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('reg_page') }}">Регистрация</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{{ url_for('login_page') }}">Авторизация</a>
+        </li>
+    </ul>
+    {% block body %}
         <p class="lead" style="text-align: center">
-            В данном разделе вы можете создать график дежурств
+            В данном разделе вы можете создать нормированный график дежурств
         </p>
         <form action="{{ url_for('index_page') }}" method="post">
             <div class="input-group">
@@ -51,7 +51,7 @@
             Для перехода на страницу по созданию ненормированных рабочих графиков нажмите на "Перейти".
         </p>
         <a class="btn btn-primary" href="{{ url_for('irr_graph') }}" role="button">Перейти</a>
-    </div>
-{% endblock %}
+        </div>
+    {% endblock %}
 </body>
 </html>
