@@ -1,0 +1,15 @@
+{% extends "index.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block body %}
+    <p class="lead" style="text-align: center">
+        Заполните все поля!
+    </p>
+    <form action="{{ url_for('irr_graph') }}" method="post">
+        <div class="input-group-col">
+            {% for i in range(count_input) %}
+                <span class="input-group-text">ФИО:</span>
+                <input type="text" name="input_count" requiredaria-label="First name" class="form-control" required>
+            {% endfor %}
+        </div>
+    </form>
+{% endblock %}
