@@ -2,7 +2,7 @@ import calendar
 import datetime
 
 
-def show_duty_days(fio: list):
+def show_duty_days_1(fio: list):
     duty_table = dict()
     days_list_temp = list()
     start_day = 1
@@ -22,7 +22,7 @@ def get_work_times(fio: list):
     full_time = list()
     night_time = list()
     result_times_dict = dict()
-    for k, v in show_duty_days(fio).items():
+    for k, v in show_duty_days_1(fio).items():
         for day in range(v[-1]):
             if day in v:
                 full_time.insert(day, 22)
@@ -37,3 +37,5 @@ def get_work_times(fio: list):
     return result_times_dict
 
 
+def show_duty_days_2(data: dict):
+    pass

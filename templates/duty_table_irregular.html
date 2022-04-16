@@ -8,12 +8,12 @@
     <p class="lead" style="text-align: center">
         Заполните все поля!
     </p>
-    <form action="{{ url_for('irr_graph') }}" method="post" class="form-basic">
+    <form action="{{ url_for('irr_graph_for_count_employees', count=count_input) }}" method="post" class="form-basic">
         <div class="input-group-col">
             {% for i in range(count_input) %}
-                <input type="text" name="input_count" requiredaria-label="First name" class="form-control" required
+                <input type="text" name="fio-{{ i }}" requiredaria-label="First name" class="form-control" required
                        value="ФИО">
-                <input type="text" name="input_count" requiredaria-label="First name" class="form-control" required
+                <input type="text" name="date-{{ i }}" requiredaria-label="First name" class="form-control" required
                        value="Даты дежурств через запятую">
                 <br>
             {% endfor %}

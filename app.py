@@ -1,6 +1,23 @@
 from flask import Flask, request, render_template, redirect, url_for
+from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.bd'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+db = SQLAlchemy(app)
+
+
+class Users(db.Model):
+    __tablename__ = 'users'
+
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(20), nullable=False)
+    phone = db.Column(db.String(20), nullable=False)
+    force = db.Column(db.String(300), nullable=False)
+    psw = db.Column(db.String(30), nullable=False)
+
+    def __repr__(self):
+        return f'{Users}-{self.id}'
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -21,9 +38,23 @@ def login_page():
     return render_template('login.html', title='Войти в систему')
 
 
-@app.route('/registration/')
+@app.route('/registration/', methods=['GET', 'POST'])
 def reg_page():
-    return render_template('registration.html', title='Регистрация')
+    if request.method == 'POST':
+        db.create_all()
+        email = request.form.get('email')
+        phone = request.form.get('phone')
+        force = request.form.get('f')
+        psw = request.form.get('psw')
+        users = Users(email=email, phone=phone, force=force, psw=psw)
+        try:
+            db.session.add(users)
+            db.session.commit()
+            return redirect(url_for('index_page'))
+        except:
+            return 'Ошибка при регистрации!'
+    else:
+        return render_template('registration.html', title='Регистрация')
 
 
 @app.route('/irregular_graph/', methods=['GET', 'POST'])
@@ -38,7 +69,11 @@ def irr_graph():
 @app.route('/irregular_graph/employees/<int:count>/', methods=['GET', 'POST'])
 def irr_graph_for_count_employees(count):
     if request.method == 'POST':
-        pass
+        data = dict()
+        for i in range(count):
+            data[request.form.get(f'fio-{i}')] = request.form.get(f'date-{i}')
+        print(data)
+        return "Hello"
     else:
         return render_template('duty_table_irregular.html', count_input=count, title='Ненормированный график')
 
