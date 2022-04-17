@@ -11,13 +11,24 @@ class Users(db.Model):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(20), nullable=False)
+    email = db.Column(db.String(20), nullable=False, unique=True)
     phone = db.Column(db.String(20), nullable=False)
     force = db.Column(db.String(300), nullable=False)
     psw = db.Column(db.String(30), nullable=False)
 
     def __repr__(self):
-        return f'{Users}-{self.id}'
+        return f'Users-{self.id}'
+
+
+class Employees(db.Model):
+    __tablename__ = 'employees'
+
+    id = db.Column(db.Integer, primary_key=True)
+    force = db.Column(db.String(300), nullable=False)
+    employees = db.Column(db.TEXT, nullable=False)
+
+    def __repr__(self):
+        return f'Employees-{self.id}'
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -27,7 +38,6 @@ def index_page():
         fio_2 = request.form.get('fio_2')
         fio_3 = request.form.get('fio_3')
         name_word_file = request.form.get('name_file')
-        # create_words_file([fio_1, fio_2, fio_3], f'{name_word_file}')
         return render_template('duty_table_regular.html', tittle='Ответ сервера')
     else:
         return render_template('index.html', title='СЭБ ОК РКЗ "Ресурс"')
@@ -46,9 +56,12 @@ def reg_page():
         phone = request.form.get('phone')
         force = request.form.get('f')
         psw = request.form.get('psw')
+        info_about_emp = request.form.get('info_about_employees')
         users = Users(email=email, phone=phone, force=force, psw=psw)
+        employees = Employees(force=force, employees=info_about_emp)
         try:
             db.session.add(users)
+            db.session.add(employees)
             db.session.commit()
             return redirect(url_for('index_page'))
         except:

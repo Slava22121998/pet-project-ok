@@ -1,41 +1,35 @@
 import calendar
 import datetime
+import json
 
 
-def show_duty_days_1(fio: list):
-    duty_table = dict()
-    days_list_temp = list()
+def get_data_about_employees(fio: list):
+    days_count = calendar.mdays[datetime.date.today().month]  # Получаем количество дней в месяце
+    employees_data_dict = dict()
+    days_of_duty_list = list()
     start_day = 1
-    days_count = calendar.mdays[datetime.date.today().month]
-
-    for name in fio:
+    for item in fio:
         for day in range(start_day, days_count + 1, 3):
-            days_list_temp.append(day)
+            days_of_duty_list.append(day)
+        if '/' in item:  # Если в смену заступает 2 контролёра
+            for name in item.split('/'):
+                employees_data_dict[name] = days_of_duty_list
+        else:
+            employees_data_dict[item] = days_of_duty_list  # Создаем словарь с днями дежурств - нормализованный график
+        days_of_duty_list = []
         start_day += 1
-        duty_table[name] = days_list_temp
-        days_list_temp = []
 
-    return duty_table
+    return json.dumps(employees_data_dict)  # Преобразуем к JSON - формату для удобной передачи данных
 
 
-def get_work_times(fio: list):
-    full_time = list()
-    night_time = list()
-    result_times_dict = dict()
-    for k, v in show_duty_days_1(fio).items():
-        for day in range(v[-1]):
-            if day in v:
-                full_time.insert(day, 22)
-                night_time.insert(day, 8)
-            else:
-                full_time.insert(day, '')
-                night_time.insert(day, '')
-            result_times_dict[k] = {'day': full_time, 'night': night_time}
-        full_time = []
-        night_time = []
-
-    return result_times_dict
+# print(get_data_about_employees(['Ivanov/Petrov', 'Sidorov/Glebov', 'Nepran/Kungurov']))
+# print(get_data_about_employees(['Ivanov', 'Sidorov', 'Nepran']))
 
 
-def show_duty_days_2(data: dict):
-    pass
+def set_info_about_employees(force: str, fio: list):
+    employees_data = dict()
+    employees_data[force] = fio
+    return json.dumps(employees_data)
+
+
+print(set_info_about_employees('OP Berezovka', ['Ivanov', 'Petrov']))
