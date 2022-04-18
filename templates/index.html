@@ -37,31 +37,37 @@
         </ul>
     {% endblock %}
     {% block body %}
-        <p class="lead" style="text-align: center">
-            В данном разделе вы можете создать нормированный график дежурств
-        </p>
-        <form action="{{ url_for('index_page') }}" method="post">
-            <div class="input-group">
-                <span class="input-group-text">Имя файла:</span>
-                <input type="text" name="name_file" requiredaria-label="First name" class="form-control">
-                <span class="input-group-text dropdown">ФИО:</span>
-                {% for i in range(1,4) %}
-                    <input class="form-control" list="datalistOptions" id="exampleDataList" placeholder="ФИО..."
-                           name="fio-{{ i }}">
-                    <datalist id="datalistOptions">
-                        {% for fio in fio_list %}
-                            <option value="{{ fio }}">
-                        {% endfor %}
-                    </datalist>
-                {% endfor %}
-                <button class="btn btn-outline-secondary" type="submit">Отправить</button>
+        {% if authorization %}
+            <p class="lead" style="text-align: center">
+                В данном разделе вы можете создать нормированный график дежурств
+            </p>
+            <form action="{{ url_for('index_page') }}" method="post">
+                <div class="input-group">
+                    <span class="input-group-text">Имя файла:</span>
+                    <input type="text" name="name_file" requiredaria-label="First name" class="form-control">
+                    <span class="input-group-text dropdown">ФИО:</span>
+                    {% for i in range(1,4) %}
+                        <input class="form-control" list="datalistOptions" id="exampleDataList" placeholder="ФИО..."
+                               name="fio-{{ i }}">
+                        <datalist id="datalistOptions">
+                            {% for fio in fio_list %}
+                                <option value="{{ fio }}">
+                            {% endfor %}
+                        </datalist>
+                    {% endfor %}
+                    <button class="btn btn-outline-secondary" type="submit">Отправить</button>
+                </div>
+            </form>
+            <p class="lead">
+                Для перехода на страницу по созданию ненормированных рабочих графиков нажмите на "Перейти".
+            </p>
+            <a class="btn btn-primary" href="{{ url_for('irr_graph') }}" role="button">Перейти</a>
             </div>
-        </form>
-        <p class="lead">
-            Для перехода на страницу по созданию ненормированных рабочих графиков нажмите на "Перейти".
-        </p>
-        <a class="btn btn-primary" href="{{ url_for('irr_graph') }}" role="button">Перейти</a>
-        </div>
+        {% else %}
+            <p class="lead">
+                Для начала работы сервиса - пройдите процедуру авторизации.
+            </p>
+        {% endif %}
     {% endblock %}
 </body>
 </html>

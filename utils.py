@@ -1,6 +1,5 @@
 import calendar
 import datetime
-import json
 
 
 def get_data_about_employees(fio: list):
@@ -19,17 +18,11 @@ def get_data_about_employees(fio: list):
         days_of_duty_list = []
         start_day += 1
 
-    return json.dumps(employees_data_dict)  # Преобразуем к JSON - формату для удобной передачи данных
+    return employees_data_dict  # Преобразуем к JSON - формату для удобной передачи данных
 
 
 # print(get_data_about_employees(['Ivanov/Petrov', 'Sidorov/Glebov', 'Nepran/Kungurov']))
 # print(get_data_about_employees(['Ivanov', 'Sidorov', 'Nepran']))
-
-
-def set_info_about_employees(force: str, fio: list):
-    employees_data = dict()
-    employees_data[force] = fio
-    return json.dumps(employees_data)
 
 
 # print(set_info_about_employees('OP Berezovka', ['Ivanov', 'Petrov']))
