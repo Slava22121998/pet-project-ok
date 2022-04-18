@@ -1,0 +1,27 @@
+{% extends "index.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block body %}
+    <p class="lead">
+        Заполните все поля!
+    </p>
+    <form action="{{ url_for('irr_graph_result', count=count) }}" method="post">
+        <div class="row g-3">
+            <div class="col-auto">
+                {% for i in range(1, count + 1) %}
+                    <input class="form-control" list="datalistOptions" id="exampleDataList" placeholder="ФИО..."
+                           name="fio-{{ i }}">
+                    <input class="form-control"
+                           placeholder="Дни дежурств..."
+                           name="date-{{ i }}">
+                    <br>
+                    <datalist id="datalistOptions">
+                        {% for fio in fio_list %}
+                            <option value="{{ fio }}">
+                        {% endfor %}
+                    </datalist>
+                {% endfor %}
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary" name="button_flag">Ввести</button>
+    </form>
+{% endblock %}

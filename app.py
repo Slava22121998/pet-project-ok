@@ -1,4 +1,4 @@
-from flask import Flask, request, render_template, redirect, url_for, session
+from flask import Flask, request, render_template, redirect, session, url_for
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -33,8 +33,8 @@ def index_page():
         fio_1 = request.form.get('fio-1')
         fio_2 = request.form.get('fio-2')
         fio_3 = request.form.get('fio-3')
-        print(fio_1, fio_2, fio_3)
-        return 'Hello'
+        # print(fio_1, fio_2, fio_3)
+        return render_template('response_of_server.html', title='Ответ сервера', authorization=True)
     else:
         if 'logged' in session:
             fio_list = get_fio_of_employees(Users.query.filter_by(name=session.get('logged')).all()[0].force)
@@ -92,25 +92,26 @@ def reg_page():
         return render_template('registration.html', title='Регистрация')
 
 
-@app.route('/irregular_graph/', methods=['GET', 'POST'])
-def irr_graph():
+@app.route('/create/unnormal_schedule/', methods=['GET', 'POST'])
+def irr_graph_temp():
     if request.method == 'POST':
-        input_count = int(request.form.get('input_count'))
-        return redirect(url_for('irr_graph_for_count_employees', count=input_count))
-    else:
-        return render_template('employees_count.html', title='Количество сотрудников')
+        employees_count = int(request.form.get('posts_count'))
+        return redirect(url_for('irr_graph_result', count=employees_count))
+
+    return render_template('unnormal_shedule_temp.html', authorization=True)
 
 
-@app.route('/irregular_graph/employees/<int:count>/', methods=['GET', 'POST'])
-def irr_graph_for_count_employees(count):
+@app.route('/create/unnormal_schedule/persons/<int:count>', methods=['GET', 'POST'])
+def irr_graph_result(count):
     if request.method == 'POST':
-        data = dict()
-        for i in range(count):
-            data[request.form.get(f'fio-{i}')] = request.form.get(f'date-{i}')
-        print(data)
-        return "Hello"
-    else:
-        return render_template('duty_table_irregular.html', count_input=count, title='Ненормированный график')
+        fio_dict = dict()
+        for i in range(1, count + 1):
+            fio_dict[request.form.get(f'fio-{i}')] = ''.join(request.form.get(f'date-{i}'))
+        print(fio_dict)
+        return render_template('response_of_server.html', title='Ответ сервера', authorization=True)
+
+    return render_template('unnormal_shedule.html', count=count, fio_list=get_fio_of_employees(
+        Users.query.filter_by(name=session.get('logged')).all()[0].force), authorization=True)
 
 
 @app.route('/user/<username>/')
@@ -122,6 +123,22 @@ def user_page(username):
     except Exception as error:
         print(error)
         return 'Ошибка чтения из БД'
+
+
+@app.route(f'/report_card/', methods=['GET', 'POST'])
+def report_card_page():
+    fio_list = get_fio_of_employees(
+        Users.query.filter_by(name=session.get('logged')).all()[0].force)
+    fio_list_size = len(fio_list)
+    if request.method == 'POST':
+        duty_days_of_employees_dict = dict()
+        for i in range(1, fio_list_size + 1):
+            duty_days_of_employees_dict[request.form.get(f'fio-{i}')] = ''.join(request.form.get(f'date-{i}'))
+        # print(duty_days_of_employees_dict)
+        return render_template('response_of_server.html', title='Ответ сервера', authorization=True)
+
+    return render_template('report_card.html', title='Табель учета рабочего времени', fio_list=fio_list,
+                           size=fio_list_size, authorization=True)
 
 
 if __name__ == '__main__':

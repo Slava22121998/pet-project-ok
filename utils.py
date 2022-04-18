@@ -21,12 +21,11 @@ def get_data_about_employees(fio: list):
     return employees_data_dict  # Преобразуем к JSON - формату для удобной передачи данных
 
 
-# print(get_data_about_employees(['Ivanov/Petrov', 'Sidorov/Glebov', 'Nepran/Kungurov']))
-# print(get_data_about_employees(['Ivanov', 'Sidorov', 'Nepran']))
-
-
-# print(set_info_about_employees('OP Berezovka', ['Ivanov', 'Petrov']))
-
-def get_fio_of_employees(info_str: str):  # Функция, которая возвращает список ФИО сотрудников
+def get_fio_of_employees(info_str: str):  # Функция, которая возвращает список ФИО сотрудников - РАБОТА БД
     info_list = info_str.split(',')
     return info_list
+
+
+def set_data_of_employees_in_report_card(
+        fio_dct: dict):  # Сюда положить старую функцию, которая вносит данные с пробелами
+    pass
