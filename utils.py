@@ -31,5 +31,4 @@ def set_info_about_employees(force: str, fio: list):
     employees_data[force] = fio
     return json.dumps(employees_data)
 
-
-print(set_info_about_employees('OP Berezovka', ['Ivanov', 'Petrov']))
+# print(set_info_about_employees('OP Berezovka', ['Ivanov', 'Petrov']))

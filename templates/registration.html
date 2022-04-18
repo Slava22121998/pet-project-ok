@@ -3,25 +3,33 @@
 {% block body %}
     <form action="{{ url_for('reg_page') }}" method="post">
         <div class="mb-3">
+            <label for="exampleInputEmail1" class="form-label">ФИО</label>
+            <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="name"
+                   required>
+        </div>
+        <div class="mb-3">
             <label for="exampleInputEmail1" class="form-label">Email</label>
-            <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="email">
+            <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="email"
+                   required>
         </div>
         <div class="mb-3">
             <label for="exampleInputEmail1" class="form-label">Телефон</label>
-            <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="phone">
+            <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="phone"
+                   required>
         </div>
         <div class="mb-3">
             <label for="exampleInputEmail1" class="form-label">Подразделение</label>
-            <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="f">
+            <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="f"
+                   required>
         </div>
         <div class="mb-3">
             <label for="exampleInputPassword1" class="form-label">Пароль</label>
-            <input type="password" class="form-control" id="exampleInputPassword1" name="psw">
+            <input type="password" class="form-control" id="exampleInputPassword1" name="psw" required>
         </div>
         <div class="mb-3">
             <label for="exampleFormControlTextarea1" class="form-label">Информация о сотрудниках</label>
             <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"
-                      name="info_about_employees"></textarea>
+                      name="info_about_employees" required></textarea>
         </div>
         <button type="submit" class="btn btn-primary">Зарегистрироваться</button>
     </form>
