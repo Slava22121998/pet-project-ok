@@ -45,8 +45,9 @@
                 <span class="input-group-text">Имя файла:</span>
                 <input type="text" name="name_file" requiredaria-label="First name" class="form-control">
                 <span class="input-group-text dropdown">ФИО:</span>
-                {% for i in range(3) %}
-                    <input class="form-control" list="datalistOptions" id="exampleDataList" placeholder="ФИО...">
+                {% for i in range(1,4) %}
+                    <input class="form-control" list="datalistOptions" id="exampleDataList" placeholder="ФИО..."
+                           name="fio-{{ i }}">
                     <datalist id="datalistOptions">
                         {% for fio in fio_list %}
                             <option value="{{ fio }}">

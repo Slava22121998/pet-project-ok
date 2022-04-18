@@ -8,6 +8,7 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.bd'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SECRET_KEY'] = '55a9a636bbd25522bae0e3fc967aa50a93649728'
+app.permanent_session_lifetime = 24 * 3600
 
 db = SQLAlchemy(app)
 
@@ -29,7 +30,11 @@ class Users(db.Model):
 @app.route('/', methods=['GET', 'POST'])
 def index_page():
     if request.method == 'POST':
-        pass
+        fio_1 = request.form.get('fio-1')
+        fio_2 = request.form.get('fio-2')
+        fio_3 = request.form.get('fio-3')
+        print(fio_1, fio_2, fio_3)
+        return 'Hello'
     else:
         if 'logged' in session:
             fio_list = get_fio_of_employees(Users.query.filter_by(name=session.get('logged')).all()[0].force)
@@ -43,17 +48,12 @@ def login_page():
     if request.method == 'POST':
         email = request.form.get('email')
         password = request.form.get('psw')
-        remember_me = request.form.get('ch_b')
         res = Users.query.all()
         for item in res:
             if item.email == email and check_password_hash(item.psw, password):
                 if 'logged' not in session:
                     session['logged'] = item.name
-                    if remember_me:
-                        session.permanent = True
                     return redirect('/')
-                else:
-                    return 'Вы уже авторизованы!'
 
         return 'Проблемы с авторизацией'
 
