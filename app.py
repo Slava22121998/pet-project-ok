@@ -2,6 +2,8 @@ from flask import Flask, request, render_template, redirect, url_for, session
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 
+from utils import get_fio_of_employees
+
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.bd'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -12,27 +14,16 @@ db = SQLAlchemy(app)
 
 class Users(db.Model):
     __tablename__ = 'users'
-
+    id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), nullable=False)
-    id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(125), nullable=False, unique=True)
-    phone = db.Column(db.String(125), nullable=False)
-    force = db.Column(db.String(255), nullable=False)
     psw = db.Column(db.String(125), nullable=False)
+    phone = db.Column(db.String(125), nullable=False)
+    unit = db.Column(db.String(255), nullable=False)
+    force = db.Column(db.Text, nullable=False)
 
     def __repr__(self):
-        return f'Users-{self.id}'
-
-
-class Employees(db.Model):
-    __tablename__ = 'employees'
-
-    id = db.Column(db.Integer, primary_key=True)
-    force = db.Column(db.String(300), nullable=False)
-    employees = db.Column(db.TEXT, nullable=False)
-
-    def __repr__(self):
-        return f'Employees-{self.id}'
+        return f'users-{self.id}'
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -41,7 +32,8 @@ def index_page():
         pass
     else:
         if 'logged' in session:
-            return render_template('index.html', title='СЭБ ОК РКЗ "Ресурс"', authorization=True)
+            fio_list = get_fio_of_employees(Users.query.filter_by(name=session.get('logged')).all()[0].force)
+            return render_template('index.html', title='СЭБ ОК РКЗ "Ресурс"', authorization=True, fio_list=fio_list)
         else:
             return render_template('index.html', title='СЭБ ОК РКЗ "Ресурс"', authorization=False)
 
@@ -77,21 +69,21 @@ def logout_page():
 
 @app.route('/registration/', methods=['GET', 'POST'])
 def reg_page():
+    db.create_all()
     if request.method == 'POST':
         name = request.form.get('name')
         email = request.form.get('email')
         phone = request.form.get('phone')
-        force = request.form.get('f')
+        unit = request.form.get('f')
         psw = generate_password_hash(request.form.get('psw'))  # Хэшируем пароль
         info_about_emp = request.form.get('info_about_employees')
-        users = Users(name=name, email=email, phone=phone, force=force, psw=psw)
-        employees = Employees(force=force, employees=info_about_emp)
+        users = Users(name=name, email=email, phone=phone, psw=psw, unit=unit, force=info_about_emp)
         users_email = [x.email for x in db.session.query(
             Users.email).distinct()]  # Получаем список, в котором хранятся почты пользователей
         if email not in users_email:
-            db.session.add_all([users, employees])
-            db.session.flush()
+            db.session.add(users)
             db.session.commit()
+            session['logged'] = name
             return redirect('/')
         else:
             return 'Пользователь с таким email уже существует'
@@ -123,9 +115,14 @@ def irr_graph_for_count_employees(count):
 
 @app.route('/user/<username>/')
 def user_page(username):
-    return f'Страница с личной информацией {username}'
+    try:
+        res = Users.query.all()
+        print(res)
+        return render_template('user_page.html', title='Личный кабинет', info=res, authorization=True)
+    except Exception as error:
+        print(error)
+        return 'Ошибка чтения из БД'
 
 
-db.create_all()
 if __name__ == '__main__':
     app.run()

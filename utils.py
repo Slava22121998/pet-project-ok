@@ -31,4 +31,9 @@ def set_info_about_employees(force: str, fio: list):
     employees_data[force] = fio
     return json.dumps(employees_data)
 
+
 # print(set_info_about_employees('OP Berezovka', ['Ivanov', 'Petrov']))
+
+def get_fio_of_employees(info_str: str):  # Функция, которая возвращает список ФИО сотрудников
+    info_list = info_str.split(',')
+    return info_list

@@ -1,0 +1,33 @@
+{% extends "index.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block menu %}
+    <ul class="nav nav-pills">
+            <li class="nav-item">
+                <a class="nav-link active" aria-current="page" href="{{ url_for('index_page') }}">Главная</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">О нас</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">Контакты</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">Политика безопасности</a>
+            </li>
+            {% if authorization %}
+                <a class="btn btn-primary" href="{{ url_for('logout_page') }}" role="button">Выйти</a>
+            {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('login_page') }}">Авторизация</a>
+                </li>
+            {% endif %}
+        </ul>
+{% endblock %}
+{% block body %}
+    <p class="lead">Руководитель ОК СЭБ РЗК "Ресурс" - {{ session.get('logged') }}</p>
+    {% for item in info %}
+        {% if session.get('logged') == item.name %}
+            <p class="lead">Личный состав: {{ item.force }}</p>
+        {% endif %}
+    {% endfor %}
+{% endblock %}
