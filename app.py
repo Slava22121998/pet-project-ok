@@ -118,8 +118,9 @@ def irr_graph_result(count):
 def user_page(username):
     try:
         res = Users.query.all()
-        print(res)
-        return render_template('user_page.html', title='Личный кабинет', info=res, authorization=True)
+        unit = Users.query.filter_by(name=session.get('logged')).all()[0].unit
+        # print(res)
+        return render_template('user_page.html', title='Личный кабинет', unit=unit, info=res, authorization=True)
     except Exception as error:
         print(error)
         return 'Ошибка чтения из БД'

@@ -18,7 +18,7 @@ def get_data_about_employees(fio: list):
         days_of_duty_list = []
         start_day += 1
 
-    return employees_data_dict  # Преобразуем к JSON - формату для удобной передачи данных
+    return employees_data_dict
 
 
 def get_fio_of_employees(info_str: str):  # Функция, которая возвращает список ФИО сотрудников - РАБОТА БД

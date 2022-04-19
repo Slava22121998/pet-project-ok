@@ -59,13 +59,13 @@
                 </div>
             </form>
             <p class="lead">
-                Для перехода на страницу по созданию ненормированных рабочих графиков нажмите на "Перейти".
+                <a class="btn btn-primary" href="{{ url_for('irr_graph_temp') }}" role="button">Перейти</a>
+                на страницу по созданию ненормированных рабочих графиков
             </p>
-            <a class="btn btn-primary" href="{{ url_for('irr_graph_temp') }}" role="button">Перейти</a>
             <p class="lead">
-                Для перехода на страницу по созданию табеля рабочего времени нажмите на "Перейти".
+                <a class="btn btn-primary" href="{{ url_for('report_card_page') }}" role="button">Перейти</a>
+                на страницу по созданию табеля рабочего времени
             </p>
-            <a class="btn btn-primary" href="{{ url_for('report_card_page') }}" role="button">Перейти</a>
             </div>
         {% else %}
             <p class="lead">
