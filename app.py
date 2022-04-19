@@ -2,7 +2,7 @@ from flask import Flask, request, render_template, redirect, session, url_for
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from utils import get_fio_of_employees
+from utils import get_fio_of_employees, set_data_of_employees_in_report_card
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.bd'
@@ -98,7 +98,7 @@ def irr_graph_temp():
         employees_count = int(request.form.get('posts_count'))
         return redirect(url_for('irr_graph_result', count=employees_count))
 
-    return render_template('unnormal_shedule_temp.html', authorization=True)
+    return render_template('unnormal_shedule_temp.html', authorization=True, title='Введите количество контролёров')
 
 
 @app.route('/create/unnormal_schedule/persons/<int:count>', methods=['GET', 'POST'])
@@ -134,8 +134,8 @@ def report_card_page():
     if request.method == 'POST':
         duty_days_of_employees_dict = dict()
         for i in range(1, fio_list_size + 1):
-            duty_days_of_employees_dict[request.form.get(f'fio-{i}')] = ''.join(request.form.get(f'date-{i}'))
-        # print(duty_days_of_employees_dict)
+            duty_days_of_employees_dict[request.form.get(f'fio-{i}')] = (request.form.get(f'date-{i}')).split(',')
+        set_data_of_employees_in_report_card(duty_days_of_employees_dict)
         return render_template('response_of_server.html', title='Ответ сервера', authorization=True)
 
     return render_template('report_card.html', title='Табель учета рабочего времени', fio_list=fio_list,

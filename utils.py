@@ -1,6 +1,8 @@
 import calendar
 import datetime
 
+import openpyxl
+
 
 def get_data_about_employees(fio: list):
     days_count = calendar.mdays[datetime.date.today().month]  # Получаем количество дней в месяце
@@ -26,6 +28,19 @@ def get_fio_of_employees(info_str: str):  # Функция, которая во�
     return info_list
 
 
-def set_data_of_employees_in_report_card(
-        fio_dct: dict):  # Сюда положить старую функцию, которая вносит данные с пробелами
-    pass
+def set_data_of_employees_in_report_card(fio_dct: dict):
+    book = openpyxl.Workbook()
+    sheet = book.active
+    row_count = 1
+    col_count = 2
+    for day in range(1, calendar.mdays[datetime.date.today().month] + 1):
+        sheet.cell(row=row_count, column=col_count).value = day
+        col_count += 1
+    for fio, dates in fio_dct.items():
+        sheet.cell(row=row_count + 1, column=1).value = fio
+        for date in dates:
+            sheet.cell(row=row_count + 1, column=int(date) + 1).value = 22
+        row_count += 1
+
+    book.save('static/excel_files/table.xls')
+    book.close()
