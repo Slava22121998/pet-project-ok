@@ -24,9 +24,9 @@
     </ul>
 {% endblock %}
 {% block body %}
-    <p class="lead fw-bold">Руководитель ОК СЭБ РЗК "Ресурс" {{ unit }}: {{ session.get('logged') }}</p>
+    <p class="lead fw-bold">Руководитель ОК СЭБ РЗК "Ресурс" {{ unit }}: {{ name }}</p>
     {% for item in info %}
-        {% if session.get('logged') == item.name %}
+        {% if session.get('logged') == item.login %}
             <p class="lead">Контролёры:</p>
             <ol class="list-group list-group-numbered">
                 {% for fio in item.force.split(',') %}

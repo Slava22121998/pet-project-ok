@@ -1,8 +1,10 @@
+from datetime import datetime
+
 from flask import Flask, request, render_template, redirect, session, url_for
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from utils import get_fio_of_employees, set_data_of_employees_in_report_card
+from utils import get_fio_of_employees, set_data_of_employees_in_report_card, get_data_about_employees
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.bd'
@@ -14,17 +16,30 @@ db = SQLAlchemy(app)
 
 
 class Users(db.Model):
-    __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), nullable=False)
+    login = db.Column(db.String(50), nullable=False, unique=True)
     email = db.Column(db.String(125), nullable=False, unique=True)
     psw = db.Column(db.String(125), nullable=False)
-    phone = db.Column(db.String(125), nullable=False)
-    unit = db.Column(db.String(255), nullable=False)
+    phone = db.Column(db.String(125), nullable=False, unique=True)
+    unit = db.Column(db.String(255), nullable=False, unique=True)
     force = db.Column(db.Text, nullable=False)
+
+    employ = db.relationship('Employees', backref='users', lazy=True)
 
     def __repr__(self):
         return f'users-{self.id}'
+
+
+class Employees(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String, unique=True, nullable=False)
+    unit = db.Column(db.String, db.ForeignKey('users.unit'), nullable=False)
+    duty_days = db.Column(db.String, default='Дни дежурств не заполнены')
+    datetime = db.Column(db.DateTime, default=datetime.utcnow())
+
+    def __repr__(self):
+        return f'<employees-{self.id}>'
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -33,11 +48,17 @@ def index_page():
         fio_1 = request.form.get('fio-1')
         fio_2 = request.form.get('fio-2')
         fio_3 = request.form.get('fio-3')
-        # print(fio_1, fio_2, fio_3)
+        employees = get_data_about_employees([fio_1, fio_2, fio_3])
+        for fio, dates in employees.items():
+            employees = Employees(username=fio, unit=Users.query.filter_by(login=session.get('logged')).all()[0].unit,
+                                  duty_days=",".join(dates))
+            db.session.add(employees)
+            db.session.commit()
         return render_template('response_of_server.html', title='Ответ сервера', authorization=True)
+
     else:
         if 'logged' in session:
-            fio_list = get_fio_of_employees(Users.query.filter_by(name=session.get('logged')).all()[0].force)
+            fio_list = get_fio_of_employees(Users.query.filter_by(login=session.get('logged')).all()[0].force)
             return render_template('index.html', title='СЭБ ОК РКЗ "Ресурс"', authorization=True, fio_list=fio_list)
         else:
             return render_template('index.html', title='СЭБ ОК РКЗ "Ресурс"', authorization=False)
@@ -52,7 +73,7 @@ def login_page():
         for item in res:
             if item.email == email and check_password_hash(item.psw, password):
                 if 'logged' not in session:
-                    session['logged'] = item.name
+                    session['logged'] = item.login
                     return redirect('/')
 
         return 'Проблемы с авторизацией'
@@ -69,21 +90,23 @@ def logout_page():
 
 @app.route('/registration/', methods=['GET', 'POST'])
 def reg_page():
-    db.create_all()
     if request.method == 'POST':
         name = request.form.get('name')
+        login = request.form.get('login')
         email = request.form.get('email')
         phone = request.form.get('phone')
-        unit = request.form.get('f')
         psw = generate_password_hash(request.form.get('psw'))  # Хэшируем пароль
-        info_about_emp = request.form.get('info_about_employees')
-        users = Users(name=name, email=email, phone=phone, psw=psw, unit=unit, force=info_about_emp)
+        unit = request.form.get('unit')
+        force = request.form.get('info_about_employees')
+
+        users = Users(name=name, login=login, email=email, phone=phone, psw=psw, unit=unit, force=force)
+
         users_email = [x.email for x in db.session.query(
-            Users.email).distinct()]  # Получаем список, в котором хранятся почты пользователей
+            Users.email).distinct()]  # Получаем уникальный список, в котором хранятся почты пользователей
         if email not in users_email:
             db.session.add(users)
             db.session.commit()
-            session['logged'] = name
+            session['logged'] = login
             return redirect('/')
         else:
             return 'Пользователь с таким email уже существует'
@@ -111,16 +134,17 @@ def irr_graph_result(count):
         return render_template('response_of_server.html', title='Ответ сервера', authorization=True)
 
     return render_template('unnormal_shedule.html', count=count, fio_list=get_fio_of_employees(
-        Users.query.filter_by(name=session.get('logged')).all()[0].force), authorization=True)
+        Users.query.filter_by(login=session.get('logged')).all()[0].force), authorization=True)
 
 
 @app.route('/user/<username>/')
 def user_page(username):
     try:
         res = Users.query.all()
-        unit = Users.query.filter_by(name=session.get('logged')).all()[0].unit
+        unit = Users.query.filter_by(login=session.get('logged')).all()[0].unit
         # print(res)
-        return render_template('user_page.html', title='Личный кабинет', unit=unit, info=res, authorization=True)
+        return render_template('user_page.html', title='Личный кабинет', unit=unit, info=res, authorization=True,
+                               name=Users.query.filter_by(login=session.get('logged')).all()[0].name)
     except Exception as error:
         print(error)
         return 'Ошибка чтения из БД'
@@ -129,13 +153,14 @@ def user_page(username):
 @app.route(f'/report_card/', methods=['GET', 'POST'])
 def report_card_page():
     fio_list = get_fio_of_employees(
-        Users.query.filter_by(name=session.get('logged')).all()[0].force)
+        Users.query.filter_by(login=session.get('logged')).all()[0].force)
     fio_list_size = len(fio_list)
     if request.method == 'POST':
         duty_days_of_employees_dict = dict()
         for i in range(1, fio_list_size + 1):
-            duty_days_of_employees_dict[request.form.get(f'fio-{i}')] = (request.form.get(f'date-{i}')).split(',')
-        set_data_of_employees_in_report_card(duty_days_of_employees_dict)
+            duty_days_of_employees_dict[request.form.get(f'fio-{i}')] = request.form.get(f'date-{i}').split(',')
+        set_data_of_employees_in_report_card(duty_days_of_employees_dict,
+                                             Users.query.filter_by(name=session.get('logged')).all()[0].unit)
         return render_template('response_of_server.html', title='Ответ сервера', authorization=True)
 
     return render_template('report_card.html', title='Табель учета рабочего времени', fio_list=fio_list,
