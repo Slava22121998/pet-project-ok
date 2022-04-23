@@ -41,7 +41,7 @@ def set_data_of_employees_in_report_card(fio_dct: dict, unit):
     for day in range(1, days_count + 1):
         sheet.cell(row=start_row, column=start_col).value = day
         sheet.cell(row=start_row, column=start_col).alignment = Alignment(horizontal="center", vertical="center")
-        sheet.cell(row=start_row, column=start_col).font = Font(bold=True, color='ff0000', name='Arial', size=16)
+        sheet.cell(row=start_row, column=start_col).font = Font(bold=True, color='ff0000', name='Arial', size=12)
         start_col += 1
     start_row = 5
     for i in range(1, len(fio_dct.keys()) + 1):
@@ -57,5 +57,5 @@ def set_data_of_employees_in_report_card(fio_dct: dict, unit):
             sheet.cell(row=start_row, column=int(day) + 3).alignment = Alignment(horizontal="center", vertical="center")
         start_row += 1
 
-    book.save(f'static/excel_files/{unit}_год.xls')
+    book.save(f'static/excel_files/{unit}_табель.xls')
     book.close()

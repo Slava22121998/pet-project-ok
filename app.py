@@ -4,7 +4,7 @@ from flask import Flask, request, render_template, redirect, session, url_for
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 
-from utils import get_fio_of_employees, set_data_of_employees_in_report_card, get_data_about_employees
+from utils import get_fio_of_employees, get_data_about_employees, set_data_of_employees_in_report_card
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///users.bd'
@@ -115,6 +115,19 @@ def reg_page():
         return render_template('registration.html', title='Регистрация')
 
 
+@app.route('/user/<username>/')
+def user_page(username):
+    try:
+        res = Users.query.all()
+        unit = Users.query.filter_by(login=session.get('logged')).all()[0].unit
+        # print(res)
+        return render_template('user_page.html', title='Личный кабинет', unit=unit, info=res, authorization=True,
+                               name=Users.query.filter_by(login=session.get('logged')).all()[0].name)
+    except Exception as error:
+        print(error)
+        return 'Ошибка чтения из БД'
+
+
 @app.route('/create/unnormal_schedule/', methods=['GET', 'POST'])
 def irr_graph_temp():
     if request.method == 'POST':
@@ -137,35 +150,16 @@ def irr_graph_result(count):
         Users.query.filter_by(login=session.get('logged')).all()[0].force), authorization=True)
 
 
-@app.route('/user/<username>/')
-def user_page(username):
-    try:
-        res = Users.query.all()
-        unit = Users.query.filter_by(login=session.get('logged')).all()[0].unit
-        # print(res)
-        return render_template('user_page.html', title='Личный кабинет', unit=unit, info=res, authorization=True,
-                               name=Users.query.filter_by(login=session.get('logged')).all()[0].name)
-    except Exception as error:
-        print(error)
-        return 'Ошибка чтения из БД'
-
-
 @app.route(f'/report_card/', methods=['GET', 'POST'])
 def report_card_page():
-    fio_list = get_fio_of_employees(
-        Users.query.filter_by(login=session.get('logged')).all()[0].force)
-    fio_list_size = len(fio_list)
-    if request.method == 'POST':
-        duty_days_of_employees_dict = dict()
-        for i in range(1, fio_list_size + 1):
-            duty_days_of_employees_dict[request.form.get(f'fio-{i}')] = request.form.get(f'date-{i}').split(',')
-        set_data_of_employees_in_report_card(duty_days_of_employees_dict,
-                                             Users.query.filter_by(name=session.get('logged')).all()[0].unit)
-        return render_template('response_of_server.html', title='Ответ сервера', authorization=True)
+    date_dict = dict()
 
-    return render_template('report_card.html', title='Табель учета рабочего времени', fio_list=fio_list,
-                           size=fio_list_size, authorization=True)
+    for item in Users.query.filter_by(login=session.get('logged')).first().employ:
+        date_dict[item.username] = item.duty_days.split(',')
 
+    set_data_of_employees_in_report_card(date_dict, Users.query.filter_by(login=session.get('logged')).first().unit)
+
+    return render_template('response_of_server.html', title='Ответ сервера', authorization=True)
 
 if __name__ == '__main__':
     app.run()
