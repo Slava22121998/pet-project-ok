@@ -33,7 +33,7 @@ class Users(db.Model):
 
 class Employees(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String, unique=True, nullable=False)
+    username = db.Column(db.String, nullable=False)
     unit = db.Column(db.String, db.ForeignKey('users.unit'), nullable=False)
     duty_days = db.Column(db.String, default='Дни дежурств не заполнены')
     datetime = db.Column(db.DateTime, default=datetime.utcnow())
@@ -140,26 +140,32 @@ def irr_graph_temp():
 @app.route('/create/unnormal_schedule/persons/<int:count>', methods=['GET', 'POST'])
 def irr_graph_result(count):
     if request.method == 'POST':
-        fio_dict = dict()
         for i in range(1, count + 1):
-            fio_dict[request.form.get(f'fio-{i}')] = ''.join(request.form.get(f'date-{i}'))
-        print(fio_dict)
+            employees = Employees(username=request.form.get(f'fio-{i}'), unit=
+            Users.query.filter_by(login=session.get('logged')).all()[0].unit,
+                                  duty_days=request.form.get(f'date-{i}'))
+            db.session.add(employees)
+            db.session.commit()
         return render_template('response_of_server.html', title='Ответ сервера', authorization=True)
 
     return render_template('unnormal_shedule.html', count=count, fio_list=get_fio_of_employees(
         Users.query.filter_by(login=session.get('logged')).all()[0].force), authorization=True)
 
 
-@app.route(f'/report_card/', methods=['GET', 'POST'])
+@app.route('/report_card/', methods=['GET', 'POST'])
 def report_card_page():
     date_dict = dict()
 
     for item in Users.query.filter_by(login=session.get('logged')).first().employ:
-        date_dict[item.username] = item.duty_days.split(',')
+        if item.username in date_dict.keys():
+            date_dict[item.username].extend(item.duty_days.split(','))
+        else:
+            date_dict[item.username] = item.duty_days.split(',')
 
-    set_data_of_employees_in_report_card(date_dict, Users.query.filter_by(login=session.get('logged')).first().unit)
+    set_data_of_employees_in_report_card(date_dict, Users.query.filter_by(login=session.get('logged')).all()[0].unit)
 
     return render_template('response_of_server.html', title='Ответ сервера', authorization=True)
+
 
 if __name__ == '__main__':
     app.run()

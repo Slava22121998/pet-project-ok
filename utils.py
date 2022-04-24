@@ -53,8 +53,15 @@ def set_data_of_employees_in_report_card(fio_dct: dict, unit):
         sheet.cell(row=start_row, column=2).value = fio
         sheet.cell(row=start_row, column=2).alignment = Alignment(horizontal="center", vertical="center")
         for day in days_list:
-            sheet.cell(row=start_row, column=int(day) + 3).value = 22
-            sheet.cell(row=start_row, column=int(day) + 3).alignment = Alignment(horizontal="center", vertical="center")
+            if '-' in day:
+                sheet.cell(row=start_row, column=int(day.split('-')[0]) + 3).value = int(day.split('-')[1])
+                sheet.cell(row=start_row, column=int(day.split('-')[0]) + 3).alignment = Alignment(
+                    horizontal="center",
+                    vertical="center")
+            else:
+                sheet.cell(row=start_row, column=int(day) + 3).value = 22
+                sheet.cell(row=start_row, column=int(day) + 3).alignment = Alignment(horizontal="center",
+                                                                                     vertical="center")
         start_row += 1
 
     book.save(f'static/excel_files/{unit}_табель.xls')
